@@ -79,6 +79,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.x += self.dx * (1/TICK_TIME)
         self.rect.y += self.dy * (1/TICK_TIME)
 
+        print(f'{self.dx}, {self.dy}')
+
 pygame.init()
 
 screen = pygame.display.set_mode([WINDOW_WIDTH, WINDOW_HEIGHT])
@@ -87,6 +89,7 @@ pygame.display.set_caption("MOCO Hackathon 2023")
 player = Player(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
 spritesList = pygame.sprite.Group()
 spritesList.add(player)
+
 
 for i in range(5):
     xpos = random.randint(0, 1000)
