@@ -7,6 +7,8 @@ WINDOW_HEIGHT = 720
 
 SCALE_IMAGE_MONSTER = (50, 50)
 SCALE_IMAGE_PLATFORM = (200, 50)
+SCALE_IMAGE_CHIHIRO = (50,50)
+SCALE_IMAGE_BALL = (50,50)
 
 TICK_TIME = 60
 
@@ -17,8 +19,12 @@ monsterImg = pygame.transform.scale(monsterImg, SCALE_IMAGE_MONSTER)
 platformPath = os.path.join(basePath, "platform5.png")
 platformImg = pygame.image.load(platformPath)
 platformImg = pygame.transform.scale(platformImg, SCALE_IMAGE_PLATFORM)
+playerPath = os.path.join(basePath, "chihiroright.png")
+playerImg = pygame.image.load(playerPath)
+playerImg = pygame.transform.scale(playerImg, SCALE_IMAGE_CHIHIRO)
 magicBallPath = os.path.join(basePath, "magicBall.png")
 magicBallImg = pygame.image.load(magicBallPath)
+magicBallImg = pygame.transform.scale(magicBallImg, SCALE_IMAGE_BALL)
 
 class Monster(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -60,8 +66,8 @@ class Platform(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.Surface([30, 30]).convert()
-        self.image.fill((255, 0, 0))
+        self.image = playerImg
+        #self.image.fill((255, 0, 0))
 
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -121,7 +127,7 @@ while play:
         else:
             player.dx = 0
 
-    pygame.draw.rect(screen, (0, 0, 0), pygame.rect.Rect((player.rect.x, player.rect.y, 30, 30)))
+    pygame.draw.rect(screen, (0, 0, 0), pygame.rect.Rect((player.rect.x, player.rect.y, 50, 50)))
     player.update()
     #screen.blit(monsterImg, (200, 200))
     spritesList.draw(screen)
