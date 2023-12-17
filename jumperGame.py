@@ -13,17 +13,17 @@ SCALE_IMAGE_BALL = (50,50)
 # colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-RED = (255, 0, 0)
+RED = (255, 255, 255)
 GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
+BLUE = (12, 156, 180)
 
 # frame rate
 # colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-RED = (255, 0, 0)
+RED = (255, 255, 255)
 GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
+BLUE = (12, 156, 180)
 
 # frame rate
 TICK_TIME = 60
