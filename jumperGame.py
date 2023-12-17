@@ -49,9 +49,15 @@ sootImg = pygame.transform.scale(sootImg, SCALE_IMAGE_CHIHIRO)
 goblinPath = os.path.join(basePath, "goblin.png")
 goblinImg = pygame.image.load(goblinPath)
 goblinImg = pygame.transform.scale(goblinImg, SCALE_IMAGE_CHIHIRO)
+cloud1Path = os.path.join(basePath, "cloud1.png")
+cloud1Img = pygame.image.load(cloud1Path)
+cloud1Img = pygame.transform.scale(cloud1Img, SCALE_IMAGE_PLATFORM)
+cloud2Path = os.path.join(basePath, "cloud2.png")
+cloud2Img = pygame.image.load(cloud2Path)
+cloud2Img = pygame.transform.scale(cloud2Img, SCALE_IMAGE_PLATFORM)
 
 monsterImgs = ["witchleft.png", "soot.png", "goblin.png"]
-
+cloudImgs = ["cloud1.png", "cloud2.png"]
 
 class Monster(pygame.sprite.Sprite):
     def __init__(self, x, y, imgPath):
@@ -110,9 +116,9 @@ class MagicBall(pygame.sprite.Sprite):
         self.rect.x += self.speed * (1/TICK_TIME)
 
 class Platform(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, imgPath):
         super().__init__()
-        self.image = platformImg
+        self.image = pygame.transform.scale(pygame.image.load(imgPath), SCALE_IMAGE_PLATFORM)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -190,11 +196,11 @@ for i in range(5):
     xpos = random.randint(100*i, 1000)
     ypos = random.randint(50*i, 500)
     m = Monster(xpos, ypos, os.path.join(basePath, random.choice(monsterImgs)))
-    p = Platform(xpos-100 + random.randint(10, 30), ypos+30)
+    p = Platform(xpos-100 + random.randint(10, 30), ypos+30, os.path.join(basePath, random.choice(cloudImgs)))
     spritesList.add(m, p)
     monstersList.append(m)
 
-    p = Platform(xpos-100 + random.randint(10, 30), ypos+30)
+    p = Platform(xpos-100 + random.randint(10, 30), ypos+30, os.path.join(basePath, random.choice(cloudImgs)))
     spritesList.add(m, p)
     monstersList.append(m)
 
@@ -245,6 +251,7 @@ while play:
     
     #pygame.draw.rect(screen, (0, 0, 0), pygame.rect.Rect((player.rect.x, player.rect.y, 50, 50)))
     player.update()
+    
     for bullet in bulletsList:
         flag = False
         # for i in range(len(monstersList)):
