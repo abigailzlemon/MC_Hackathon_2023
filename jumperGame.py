@@ -73,7 +73,6 @@ class Monster(pygame.sprite.Sprite):
 
 class MagicBall(pygame.sprite.Sprite):
     def __init__(self, x, y, speed, origin):
-    def __init__(self, x, y, speed, origin):
         super().__init__()
         self.speed = speed
         self.image = 0
