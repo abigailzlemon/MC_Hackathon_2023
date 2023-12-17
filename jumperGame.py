@@ -27,7 +27,8 @@ BLUE = (0, 0, 255)
 
 # frame rate
 TICK_TIME = 60
-
+global score
+score = 0
 basePath = os.path.dirname(__file__)
 monsterPath = os.path.join(basePath, "witchleft.png")
 monsterImg = pygame.image.load(monsterPath)
@@ -56,6 +57,7 @@ monsterImgs = ["witchleft.png", "soot.png", "goblin.png"]
 class Monster(pygame.sprite.Sprite):
     def __init__(self, x, y, frameCoolDown, imgPath):
         super().__init__()
+        global score
         self.image = pygame.transform.scale(pygame.image.load(imgPath), SCALE_IMAGE_CHIHIRO)
 
         self.rect = self.image.get_rect()
@@ -68,23 +70,18 @@ class Monster(pygame.sprite.Sprite):
 
         self.cooldown = frameCoolDown
     def collision(self, ball):
+        global score
         if ball.og == 0:
             if self.rect.x > ball.rect.x + ball.width or self.rect.x + self.width < ball.rect.x:
                 return False
             if self.rect.y > ball.rect.y + ball.height or self.rect.y + self.height < ball.rect.y:
                 return False
+            score +=25
             return True
         return False
         self.width = self.image.get_width()
         self.height = self.image.get_height()
-    def collision(self, ball):
-        if ball.og == 0:
-            if self.rect.x > ball.rect.x + ball.width or self.rect.x + self.width < ball.rect.x:
-                return False
-            if self.rect.y > ball.rect.y + ball.height or self.rect.y + self.height < ball.rect.y:
-                return False
-            return True
-        return False
+    
 
 class MagicBall(pygame.sprite.Sprite):
     def __init__(self, x, y, speed, origin):
