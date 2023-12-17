@@ -41,6 +41,9 @@ playerImg = pygame.transform.scale(playerImg, SCALE_IMAGE_CHIHIRO)
 magicBallPath = os.path.join(basePath, "magicBall.png")
 magicBallImg = pygame.image.load(magicBallPath)
 magicBallImg = pygame.transform.scale(magicBallImg, SCALE_IMAGE_BALL)
+redBallPath = os.path.join(basePath, "blueBoltPNG.png")
+redBallImg = pygame.image.load(redBallPath)
+redBallImg = pygame.transform.scale(redBallImg, SCALE_IMAGE_BALL)
 bgPath = os.path.join(basePath,"bg.png")
 bg = pygame.image.load(bgPath)
 sootPath = os.path.join(basePath, "soot.png")
@@ -91,12 +94,19 @@ class MagicBall(pygame.sprite.Sprite):
         super().__init__()
         self.speed = speed
         self.image = 0
-        if self.speed > 0:
-            self.image = pygame.transform.flip(magicBallImg, True, False)
+        self.og = origin #1 means from monster, 0 means from player
+        if self.og == 0:
+            if self.speed > 0:
+                self.image = pygame.transform.flip(magicBallImg, True, False)
+            else:
+                self.image = magicBallImg
         else:
-            self.image = magicBallImg
+            if self.speed > 0:
+                self.image = pygame.transform.flip(redBallImg, True, False)
+            else:
+                self.image = redBallImg
         self.speed = speed
-        self.image = 0
+        
         if self.speed > 0:
             self.image = pygame.transform.flip(magicBallImg, True, False)
         else:
@@ -138,6 +148,8 @@ class Player(pygame.sprite.Sprite):
         self.dy = 0
         self.direction = 1 #1 is right, -1 is left
         self.health = 5
+        self.kills = 0
+        self.score = 0
 
     def update(self):
         self.rect.x += self.dx * (1/TICK_TIME)
@@ -197,9 +209,16 @@ play = True
 gameTime = 0
 cooldown = 120
 
+font = pygame.font.Font('freesansbold.ttf', 32)
+
 while play:
     gameTime += 1
     cooldown += 1
+    if player.kills != 5:
+        if gameTime % 120 == 0:
+            player.score -= 1
+
+    print(player.score)
     screen.blit(bg, (0, 0))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -210,7 +229,7 @@ while play:
         
         if keys[pygame.K_ESCAPE]:
             play = False
-
+    
         if keys[pygame.K_UP]:
             player.dy = -100
         elif keys[pygame.K_DOWN]:
@@ -235,6 +254,8 @@ while play:
                 bulletsList.append(b1)
                 spritesList.add(b1)
                 gunFire.play()
+                if player.kills != 5:
+                    player.score -= 5
     
     #pygame.draw.rect(screen, (0, 0, 0), pygame.rect.Rect((player.rect.x, player.rect.y, 50, 50)))
     player.update()
@@ -246,14 +267,17 @@ while play:
                         b1 = MagicBall(mons.rect.x, mons.rect.y, random.randint(400, 500) * -.5, 1)
                         bulletsList.append(b1)
                         spritesList.add(b1)
+                        
                     else:
                         b1 = MagicBall(mons.rect.x, mons.rect.y, random.randint(400, 500) * .5, 1)
                         bulletsList.append(b1)
                         spritesList.add(b1)
+                        
     for bullet in bulletsList:
         flag = False
         if player.collision(bullet):
             player.health -= 1
+            player.score -= 5
             flag = True
             bullet.kill()
             print(player.health)
@@ -266,6 +290,8 @@ while play:
             if mons.collision(bullet):
                 
                 flag = True
+                player.kills += 1
+                player.score += 25
                 mons.kill()
                 bullet.kill()
                 mons.rect.y = -10000
@@ -280,7 +306,15 @@ while play:
     
     #screen.blit(monsterImg, (200, 200))
     spritesList.draw(screen)
-
+    if player.kills == 5:
+        text = font.render("Game Finished! Score: " + str(player.score), True, RED, BLUE)
+        textRect = text.get_rect()
+        textRect.center = (WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
+        screen.blit(text, textRect)
+    else:
+        text = font.render("SCORE: " + str(player.score), True, RED, BLUE)
+        textRect = text.get_rect()
+        screen.blit(text, textRect)
     clock.tick(TICK_TIME)
 
     pygame.display.flip()
