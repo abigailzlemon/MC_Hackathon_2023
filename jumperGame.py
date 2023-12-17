@@ -2,34 +2,32 @@ import pygame
 import random
 import os
 
+# window size
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
+# for scaling
 SCALE_IMAGE_MONSTER = (50, 50)
 SCALE_IMAGE_PLATFORM = (200, 50)
 SCALE_IMAGE_CHIHIRO = (50,50)
 SCALE_IMAGE_BALL = (50,50)
 
-# colors
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-RED = (255, 255, 255)
-GREEN = (0, 255, 0)
-BLUE = (12, 156, 180)
 
-# frame rate
 # colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-RED = (255, 255, 255)
+RED = (255, 0, 0)
 GREEN = (0, 255, 0)
-BLUE = (12, 156, 180)
+BLUE = (0, 0, 255)
+SKY_BLUE = (12, 156, 180)
 
 # frame rate
 TICK_TIME = 60
 global score
 score = 0
 basePath = os.path.dirname(__file__)
+
+# sprite images
 monsterPath = os.path.join(basePath, "witchleft.png")
 monsterImg = pygame.image.load(monsterPath)
 monsterImg = pygame.transform.scale(monsterImg, SCALE_IMAGE_MONSTER)
@@ -76,10 +74,13 @@ class Monster(pygame.sprite.Sprite):
 
         self.isAlive = True
 
+        # shooting cooldown
         self.cooldown = frameCoolDown
     def collision(self, ball):
         global score
+        # if the origin of the ball is from the player (0)
         if ball.og == 0:
+            # collision detection algorithm
             if self.rect.x > ball.rect.x + ball.width or self.rect.x + self.width < ball.rect.x:
                 return False
             if self.rect.y > ball.rect.y + ball.height or self.rect.y + self.height < ball.rect.y:
@@ -87,8 +88,6 @@ class Monster(pygame.sprite.Sprite):
             score +=25
             return True
         return False
-        self.width = self.image.get_width()
-        self.height = self.image.get_height()
     
 
 class MagicBall(pygame.sprite.Sprite):
@@ -100,6 +99,7 @@ class MagicBall(pygame.sprite.Sprite):
         blueBoltImg = pygame.image.load(os.path.join(basePath, "blueBoltPNG.png"))
         blueBoltImg = pygame.transform.scale(blueBoltImg, SCALE_IMAGE_CHIHIRO)
 
+        # different image for player and monster
         if self.og == 0:
             if self.speed > 0:
                 self.image = pygame.transform.flip(magicBallImg, True, False)
@@ -111,11 +111,6 @@ class MagicBall(pygame.sprite.Sprite):
             else:
                 self.image = blueBoltImg
         self.speed = speed
-        
-        # if self.speed > 0:
-        #     self.image = pygame.transform.flip(magicBallImg, True, False)
-        # else:
-        #     self.image = magicBallImg 
 
         self.rect = self.image.get_rect()
         self.width = self.image.get_width()
@@ -128,7 +123,7 @@ class MagicBall(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += self.speed * (1/TICK_TIME)
 
-class Platform(pygame.sprite.Sprite):
+class Platform(pygame.sprite.Sprite): # platforms
     def __init__(self, x, y, imgPath):
         super().__init__()
         self.image = pygame.transform.scale(pygame.image.load(imgPath), SCALE_IMAGE_PLATFORM)
@@ -136,11 +131,11 @@ class Platform(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
-class Player(pygame.sprite.Sprite):
+class Player(pygame.sprite.Sprite): # player
     def __init__(self, x, y):
         super().__init__()
         self.image = playerImg
-        #self.image.fill((255, 0, 0))
+        
 
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -161,7 +156,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.dy * (1/TICK_TIME)
 
 
-        #print(f'{self.dx}, {self.dy}')
+    
     def collision(self, ball):
         if ball.og == 1:
             if self.rect.x > ball.rect.x + ball.width or self.rect.x + self.width < ball.rect.x:
@@ -177,7 +172,7 @@ pygame.init()
 gunFirePath = os.path.join(basePath, "gunFire.mp3")
 jumpSoundPath = os.path.join(basePath, "jumpSound.mp3")
 gunFire = pygame.mixer.Sound(gunFirePath)
-#jumpSound = pygame.mixer.Sound(jumpSoundPath)
+
 
 # background music
 backgroundMusicPath = os.path.join(basePath, "backgroundMusic.mp3")
@@ -193,8 +188,8 @@ spritesList = pygame.sprite.Group()
 spritesList.add(player)
 bulletsList = []
 monstersList = []
-bulletsList = []
-monstersList = []
+
+# generating the monsters and platforms
 for i in range(5):
     xpos = random.randint(100*i, 1000)
     ypos = random.randint(50*i, 500)
@@ -214,17 +209,18 @@ play = True
 gameTime = 0
 cooldown = 120
 
+# font we are using
 font = pygame.font.Font('freesansbold.ttf', 32)
 
 while play:
     gameTime += 1
     cooldown += 1
-    if player.kills != 5:
+    if player.kills != 5: # if 5 kills, game is over
         if gameTime % 120 == 0:
             player.score -= 1
 
-    print(player.score)
-    screen.blit(bg, (0, 0))
+    
+    screen.blit(bg, (0, 0)) #paints over after every frame
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             play = False
@@ -234,7 +230,8 @@ while play:
         
         if keys[pygame.K_ESCAPE]:
             play = False
-    
+
+        # movement
         if keys[pygame.K_UP]:
             player.dy = -100
         elif keys[pygame.K_DOWN]:
@@ -253,21 +250,22 @@ while play:
         else:
             player.dx = 0
         if keys[pygame.K_SPACE]:
-            if cooldown >= 120:
+            if cooldown >= 120: # 60 frames in a second, 2 second cool down
                 cooldown = 0
-                b1 = MagicBall(player.rect.x, player.rect.y, 500 * player.direction, 0)
+                b1 = MagicBall(player.rect.x, player.rect.y, 500 * player.direction, 0) # ball in player direction, originating from player
                 bulletsList.append(b1)
                 spritesList.add(b1)
                 gunFire.play()
-                if player.kills != 5:
+                if player.kills != 5: #at 5 kills game is over
                     player.score -= 5
     
-    #pygame.draw.rect(screen, (0, 0, 0), pygame.rect.Rect((player.rect.x, player.rect.y, 50, 50)))
+    
     player.update()
 
     for mons in monstersList:
             if mons.isAlive:
-                if gameTime % mons.cooldown == 0:
+                if gameTime % mons.cooldown == 0: # shoots at time intervals
+                    # random if shoot left or right
                     if random.randint(0, 1) == 1:
                         b1 = MagicBall(mons.rect.x, mons.rect.y, random.randint(400, 500) * -.5, 1)
                         bulletsList.append(b1)
@@ -279,45 +277,43 @@ while play:
                         spritesList.add(b1)
                         
     for bullet in bulletsList:
+        # checks if there has been a collision
         flag = False
         if player.collision(bullet):
             player.health -= 1
             player.score -= 5
             flag = True
             bullet.kill()
-            print(player.health)
-        # for i in range(len(monstersList)):
-        #     mons = monstersList[i]
-        #     if mons.collision(bullet):
-        #         mons.kill()
-        #         monstersList.pop(i)
+    
+
         for mons in monstersList:
             if mons.collision(bullet):
                 
                 flag = True
                 player.kills += 1
                 player.score += 25
+                # removes both monster and bullet from all sprites list
                 mons.kill()
                 bullet.kill()
+                # makes sure does not interfere with future game mechanics
                 mons.rect.y = -10000
-                #monstersList.remove(mons)
-                #bulletsList.remove(bullet)
+               
             
-        #print(bullet.rect.x)
+        # if collision, render, else, remove from list
         if not flag:
             bullet.update()
         else:
             bulletsList.remove(bullet)
     
-    #screen.blit(monsterImg, (200, 200))
+    
     spritesList.draw(screen)
     if player.kills == 5:
-        text = font.render("Game Finished! Score: " + str(player.score), True, RED, BLUE)
+        text = font.render("Game Finished! Score: " + str(player.score), True, WHITE, SKY_BLUE)
         textRect = text.get_rect()
         textRect.center = (WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
         screen.blit(text, textRect)
     else:
-        text = font.render("SCORE: " + str(player.score), True, RED, BLUE)
+        text = font.render("SCORE: " + str(player.score), True, WHITE, SKY_BLUE)
         textRect = text.get_rect()
         screen.blit(text, textRect)
     clock.tick(TICK_TIME)
