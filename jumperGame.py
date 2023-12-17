@@ -46,8 +46,11 @@ bg = pygame.image.load(bgPath)
 sootPath = os.path.join(basePath, "soot.png")
 sootImg = pygame.image.load(sootPath)
 sootImg = pygame.transform.scale(sootImg, SCALE_IMAGE_CHIHIRO)
+goblinPath = os.path.join(basePath, "goblin.png")
+goblinImg = pygame.image.load(goblinPath)
+goblinImg = pygame.transform.scale(goblinImg, SCALE_IMAGE_CHIHIRO)
 
-monsterImgs = ["witchleft.png", "soot.png"]
+monsterImgs = ["witchleft.png", "soot.png", "goblin.png"]
 
 
 class Monster(pygame.sprite.Sprite):
