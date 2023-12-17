@@ -29,7 +29,7 @@ BLUE = (0, 0, 255)
 TICK_TIME = 60
 
 basePath = os.path.dirname(__file__)
-monsterPath = os.path.join(basePath, "monster dude.png")
+monsterPath = os.path.join(basePath, "witchleft.png")
 monsterImg = pygame.image.load(monsterPath)
 monsterImg = pygame.transform.scale(monsterImg, SCALE_IMAGE_MONSTER)
 platformPath = os.path.join(basePath, "platform5.png")
@@ -41,11 +41,19 @@ playerImg = pygame.transform.scale(playerImg, SCALE_IMAGE_CHIHIRO)
 magicBallPath = os.path.join(basePath, "magicBall.png")
 magicBallImg = pygame.image.load(magicBallPath)
 magicBallImg = pygame.transform.scale(magicBallImg, SCALE_IMAGE_BALL)
+bgPath = os.path.join(basePath,"bg.png")
+bg = pygame.image.load(bgPath)
+sootPath = os.path.join(basePath, "soot.png")
+sootImg = pygame.image.load(sootPath)
+sootImg = pygame.transform.scale(sootImg, SCALE_IMAGE_CHIHIRO)
+
+monsterImgs = ["witchleft.png", "soot.png"]
+
 
 class Monster(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, imgPath):
         super().__init__()
-        self.image = monsterImg
+        self.image = pygame.transform.scale(pygame.image.load(imgPath), SCALE_IMAGE_CHIHIRO)
 
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -166,7 +174,7 @@ monstersList = []
 for i in range(5):
     xpos = random.randint(100*i, 1000)
     ypos = random.randint(50*i, 500)
-    m = Monster(xpos, ypos)
+    m = Monster(xpos, ypos, os.path.join(basePath, random.choice(monsterImgs)))
     p = Platform(xpos-100 + random.randint(10, 30), ypos+30)
     spritesList.add(m, p)
     monstersList.append(m)
@@ -184,7 +192,7 @@ cooldown = 120
 
 while play:
     cooldown += 1
-    screen.fill((0, 0, 0))
+    screen.blit(bg, (0, 0))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             play = False
@@ -238,7 +246,7 @@ while play:
                 #monstersList.remove(mons)
                 #bulletsList.remove(bullet)
             
-        print(bullet.rect.x)
+        #print(bullet.rect.x)
         if not flag:
             bullet.update()
         else:
@@ -260,7 +268,7 @@ while play:
                 #monstersList.remove(mons)
                 #bulletsList.remove(bullet)
             
-        print(bullet.rect.x)
+        #print(bullet.rect.x)
         if not flag:
             bullet.update()
         else:
