@@ -161,6 +161,18 @@ class Player(pygame.sprite.Sprite):
 
 pygame.init()
 
+# sounds
+gunFirePath = os.path.join(basePath, "gunFire.mp3")
+jumpSoundPath = os.path.join(basePath, "jumpSound.mp3")
+gunFire = pygame.mixer.Sound(gunFirePath)
+#jumpSound = pygame.mixer.Sound(jumpSoundPath)
+
+# background music
+backgroundMusicPath = os.path.join(basePath, "backgroundMusic.mp3")
+pygame.mixer.music.load(backgroundMusicPath)
+pygame.mixer.music.set_volume(.3)
+pygame.mixer.music.play()
+
 screen = pygame.display.set_mode([WINDOW_WIDTH, WINDOW_HEIGHT])
 pygame.display.set_caption("MOCO Hackathon 2023")
 
@@ -226,6 +238,7 @@ while play:
                 b1 = MagicBall(player.rect.x, player.rect.y, 500 * player.direction, 0)
                 bulletsList.append(b1)
                 spritesList.add(b1)
+                gunFire.play()
     
     #pygame.draw.rect(screen, (0, 0, 0), pygame.rect.Rect((player.rect.x, player.rect.y, 50, 50)))
     player.update()
