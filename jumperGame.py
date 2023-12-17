@@ -17,11 +17,33 @@ monsterImg = pygame.transform.scale(monsterImg, SCALE_IMAGE_MONSTER)
 platformPath = os.path.join(basePath, "platform5.png")
 platformImg = pygame.image.load(platformPath)
 platformImg = pygame.transform.scale(platformImg, SCALE_IMAGE_PLATFORM)
+magicBallPath = os.path.join(basePath, "magicBall.png")
+magicBallImg = pygame.image.load(magicBallPath)
 
 class Monster(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.image = monsterImg
+
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.health = 5
+
+class MonsterHealth(pygame.sprite.Sprite):
+    def __init__(self, x, y, health):
+        super().__init__()
+        self.image = pygame.Surface([10 * health, 10]).convert()
+        self.image.fill((0, 0, 250))
+
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+class MagicBall(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.transform.flip(magicBallImg, True, False)
 
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -51,8 +73,6 @@ class Player(pygame.sprite.Sprite):
         self.rect.x += self.dx * (1/TICK_TIME)
         self.rect.y += self.dy * (1/TICK_TIME)
 
-        print(f'{self.dx}, {self.dy}')
-
 pygame.init()
 
 screen = pygame.display.set_mode([WINDOW_WIDTH, WINDOW_HEIGHT])
@@ -66,8 +86,11 @@ for i in range(5):
     xpos = random.randint(0, 1000)
     ypos = random.randint(0, 500)
     m = Monster(xpos, ypos)
+    mh = MonsterHealth(xpos, ypos - 10, m.health)
     p = Platform(xpos-100, ypos+30)
-    spritesList.add(m, p)
+    spritesList.add(m, p, mh)
+
+spritesList.add(MagicBall(100, 100))
 
 clock = pygame.time.Clock()
 
@@ -98,6 +121,7 @@ while play:
         else:
             player.dx = 0
 
+    pygame.draw.rect(screen, (0, 0, 0), pygame.rect.Rect((player.rect.x, player.rect.y, 30, 30)))
     player.update()
     #screen.blit(monsterImg, (200, 200))
     spritesList.draw(screen)
