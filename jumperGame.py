@@ -60,7 +60,7 @@ monsterImgs = ["witchleft.png", "soot.png", "goblin.png"]
 cloudImgs = ["cloud1.png", "cloud2.png"]
 
 class Monster(pygame.sprite.Sprite):
-    def __init__(self, x, y, imgPath):
+    def __init__(self, x, y, frameCoolDown, imgPath):
         super().__init__()
         self.image = pygame.transform.scale(pygame.image.load(imgPath), SCALE_IMAGE_CHIHIRO)
 
@@ -69,6 +69,10 @@ class Monster(pygame.sprite.Sprite):
         self.rect.y = y
         self.width = self.image.get_width()
         self.height = self.image.get_height()
+
+        self.isAlive = True
+
+        self.cooldown = frameCoolDown
     def collision(self, ball):
         if ball.og == 0:
             if self.rect.x > ball.rect.x + ball.width or self.rect.x + self.width < ball.rect.x:
@@ -140,23 +144,11 @@ class Player(pygame.sprite.Sprite):
         self.dy = 0
         self.direction = 1 #1 is right, -1 is left
         self.health = 5
-        self.direction = 1 #1 is right, -1 is left
-        self.health = 5
 
     def update(self):
         self.rect.x += self.dx * (1/TICK_TIME)
         self.rect.y += self.dy * (1/TICK_TIME)
 
-
-        #print(f'{self.dx}, {self.dy}')
-    def collision(self, ball):
-        if ball.og == 1:
-            if self.rect.x > ball.rect.x + ball.width or self.rect.x + self.width < ball.rect.x:
-                return False
-            if self.rect.y > ball.rect.y + ball.height or self.rect.y + self.height < ball.rect.y:
-                return False
-            return True
-        return False
 
         #print(f'{self.dx}, {self.dy}')
     def collision(self, ball):
@@ -196,7 +188,7 @@ for i in range(5):
     xpos = random.randint(100*i, 1000)
     ypos = random.randint(50*i, 500)
     m = Monster(xpos, ypos, os.path.join(basePath, random.choice(monsterImgs)))
-    p = Platform(xpos-100 + random.randint(10, 30), ypos+30, os.path.join(basePath, random.choice(cloudImgs)))
+    p = Platform(xpos-100 + random.randint(10, 30), ypos+30)
     spritesList.add(m, p)
     monstersList.append(m)
 
@@ -208,10 +200,11 @@ for i in range(5):
 clock = pygame.time.Clock()
 
 play = True
-
+gameTime = 0
 cooldown = 120
 
 while play:
+    gameTime += 1
     cooldown += 1
     screen.blit(bg, (0, 0))
     for event in pygame.event.get():
@@ -251,51 +244,34 @@ while play:
     
     #pygame.draw.rect(screen, (0, 0, 0), pygame.rect.Rect((player.rect.x, player.rect.y, 50, 50)))
     player.update()
+    for bullet in bulletsList:
+        flag = False
+        if player.collision(bullet):
+            player.health -= 1
+            flag = True
+            bullet.kill()
+            print(player.health)
+        # for i in range(len(monstersList)):
+        #     mons = monstersList[i]
+        #     if mons.collision(bullet):
+        #         mons.kill()
+        #         monstersList.pop(i)
+        for mons in monstersList:
+            if mons.collision(bullet):
+                
+                flag = True
+                mons.kill()
+                bullet.kill()
+                mons.rect.y = -10000
+                #monstersList.remove(mons)
+                #bulletsList.remove(bullet)
+            
+        #print(bullet.rect.x)
+        if not flag:
+            bullet.update()
+        else:
+            bulletsList.remove(bullet)
     
-    for bullet in bulletsList:
-        flag = False
-        # for i in range(len(monstersList)):
-        #     mons = monstersList[i]
-        #     if mons.collision(bullet):
-        #         mons.kill()
-        #         monstersList.pop(i)
-        for mons in monstersList:
-            if mons.collision(bullet):
-                
-                flag = True
-                mons.kill()
-                bullet.kill()
-                mons.rect.y = -10000
-                #monstersList.remove(mons)
-                #bulletsList.remove(bullet)
-            
-        #print(bullet.rect.x)
-        if not flag:
-            bullet.update()
-        else:
-            bulletsList.remove(bullet)
-    for bullet in bulletsList:
-        flag = False
-        # for i in range(len(monstersList)):
-        #     mons = monstersList[i]
-        #     if mons.collision(bullet):
-        #         mons.kill()
-        #         monstersList.pop(i)
-        for mons in monstersList:
-            if mons.collision(bullet):
-                
-                flag = True
-                mons.kill()
-                bullet.kill()
-                mons.rect.y = -10000
-                #monstersList.remove(mons)
-                #bulletsList.remove(bullet)
-            
-        #print(bullet.rect.x)
-        if not flag:
-            bullet.update()
-        else:
-            bulletsList.remove(bullet)
     #screen.blit(monsterImg, (200, 200))
     spritesList.draw(screen)
 
