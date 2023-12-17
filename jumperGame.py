@@ -122,8 +122,8 @@ spritesList.add(player)
 bulletsList = []
 monstersList = []
 for i in range(5):
-    xpos = random.randint(0, 1000)
-    ypos = random.randint(0, 500)
+    xpos = random.randint(100*i, 1000)
+    ypos = random.randint(50*i, 500)
     m = Monster(xpos, ypos)
     p = Platform(xpos-100 + random.randint(10, 30), ypos+30)
     spritesList.add(m, p)
@@ -134,7 +134,10 @@ clock = pygame.time.Clock()
 
 play = True
 
+cooldown = 120
+
 while play:
+    cooldown += 1
     screen.fill((0, 0, 0))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -156,15 +159,19 @@ while play:
         if keys[pygame.K_LEFT]:
             player.dx = -100
             player.direction = -1
+            player.image = pygame.transform.flip(playerImg, True, False)
         elif keys[pygame.K_RIGHT]:
             player.dx = 100
             player.direction = 1
+            player.image = playerImg
         else:
             player.dx = 0
         if keys[pygame.K_SPACE]:
-            b1 = MagicBall(player.rect.x, player.rect.y, 500 * player.direction, 0)
-            bulletsList.append(b1)
-            spritesList.add(b1)
+            if cooldown >= 120:
+                cooldown = 0
+                b1 = MagicBall(player.rect.x, player.rect.y, 500 * player.direction, 0)
+                bulletsList.append(b1)
+                spritesList.add(b1)
     
     #pygame.draw.rect(screen, (0, 0, 0), pygame.rect.Rect((player.rect.x, player.rect.y, 50, 50)))
     player.update()
