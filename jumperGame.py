@@ -26,25 +26,24 @@ magicBallPath = os.path.join(basePath, "magicBall.png")
 magicBallImg = pygame.image.load(magicBallPath)
 magicBallImg = pygame.transform.scale(magicBallImg, SCALE_IMAGE_BALL)
 
+class organism(pygame.sprite.Sprite):
+    def init(self, maxHP, image, x, y):
+        super().init()
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.maxHP = maxHP
+        self.currentHP = maxHP
+
 class Monster(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-        self.image = monsterImg
-
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-        self.health = 5
-
-class MonsterHealth(pygame.sprite.Sprite):
-    def __init__(self, x, y, health):
-        super().__init__()
-        self.image = pygame.Surface([10 * health, 10]).convert()
-        self.image.fill((0, 0, 250))
-
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+    def init(self, x, y):
+        super(Monster, self).init()
+        Monster.maxHp = 5
+        Monster.image = monsterImg
+        Monster.rect = self.image.get_rect()
+        Monster.rect.x = x
+        Monster.rect.y = y
 
 class MagicBall(pygame.sprite.Sprite):
     def __init__(self, x, y):
