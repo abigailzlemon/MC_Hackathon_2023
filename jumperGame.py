@@ -18,6 +18,14 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
 # frame rate
+# colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+
+# frame rate
 TICK_TIME = 60
 
 basePath = os.path.dirname(__file__)
@@ -52,8 +60,19 @@ class Monster(pygame.sprite.Sprite):
                 return False
             return True
         return False
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
+    def collision(self, ball):
+        if ball.og == 0:
+            if self.rect.x > ball.rect.x + ball.width or self.rect.x + self.width < ball.rect.x:
+                return False
+            if self.rect.y > ball.rect.y + ball.height or self.rect.y + self.height < ball.rect.y:
+                return False
+            return True
+        return False
 
 class MagicBall(pygame.sprite.Sprite):
+    def __init__(self, x, y, speed, origin):
     def __init__(self, x, y, speed, origin):
         super().__init__()
         self.speed = speed
@@ -62,8 +81,16 @@ class MagicBall(pygame.sprite.Sprite):
             self.image = pygame.transform.flip(magicBallImg, True, False)
         else:
             self.image = magicBallImg
+        self.speed = speed
+        self.image = 0
+        if self.speed > 0:
+            self.image = pygame.transform.flip(magicBallImg, True, False)
+        else:
+            self.image = magicBallImg
 
         self.rect = self.image.get_rect()
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
         self.width = self.image.get_width()
         self.height = self.image.get_height()
         self.rect.x = x
@@ -91,8 +118,12 @@ class Player(pygame.sprite.Sprite):
         self.rect.y = y
         self.width = self.image.get_width()
         self.height = self.image.get_height()
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
         self.dx = 0
         self.dy = 0
+        self.direction = 1 #1 is right, -1 is left
+        self.health = 5
         self.direction = 1 #1 is right, -1 is left
         self.health = 5
 
@@ -100,6 +131,16 @@ class Player(pygame.sprite.Sprite):
         self.rect.x += self.dx * (1/TICK_TIME)
         self.rect.y += self.dy * (1/TICK_TIME)
 
+
+        #print(f'{self.dx}, {self.dy}')
+    def collision(self, ball):
+        if ball.og == 1:
+            if self.rect.x > ball.rect.x + ball.width or self.rect.x + self.width < ball.rect.x:
+                return False
+            if self.rect.y > ball.rect.y + ball.height or self.rect.y + self.height < ball.rect.y:
+                return False
+            return True
+        return False
 
         #print(f'{self.dx}, {self.dy}')
     def collision(self, ball):
@@ -121,10 +162,16 @@ spritesList = pygame.sprite.Group()
 spritesList.add(player)
 bulletsList = []
 monstersList = []
+bulletsList = []
+monstersList = []
 for i in range(5):
     xpos = random.randint(100*i, 1000)
     ypos = random.randint(50*i, 500)
     m = Monster(xpos, ypos)
+    p = Platform(xpos-100 + random.randint(10, 30), ypos+30)
+    spritesList.add(m, p)
+    monstersList.append(m)
+
     p = Platform(xpos-100 + random.randint(10, 30), ypos+30)
     spritesList.add(m, p)
     monstersList.append(m)
@@ -175,6 +222,28 @@ while play:
     
     #pygame.draw.rect(screen, (0, 0, 0), pygame.rect.Rect((player.rect.x, player.rect.y, 50, 50)))
     player.update()
+    for bullet in bulletsList:
+        flag = False
+        # for i in range(len(monstersList)):
+        #     mons = monstersList[i]
+        #     if mons.collision(bullet):
+        #         mons.kill()
+        #         monstersList.pop(i)
+        for mons in monstersList:
+            if mons.collision(bullet):
+                
+                flag = True
+                mons.kill()
+                bullet.kill()
+                mons.rect.y = -10000
+                #monstersList.remove(mons)
+                #bulletsList.remove(bullet)
+            
+        print(bullet.rect.x)
+        if not flag:
+            bullet.update()
+        else:
+            bulletsList.remove(bullet)
     for bullet in bulletsList:
         flag = False
         # for i in range(len(monstersList)):
