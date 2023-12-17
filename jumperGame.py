@@ -10,6 +10,14 @@ SCALE_IMAGE_PLATFORM = (200, 50)
 SCALE_IMAGE_CHIHIRO = (50,50)
 SCALE_IMAGE_BALL = (50,50)
 
+# colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+
+# frame rate
 TICK_TIME = 60
 
 basePath = os.path.dirname(__file__)
@@ -34,26 +42,35 @@ class Monster(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.health = 5
-
-class MonsterHealth(pygame.sprite.Sprite):
-    def __init__(self, x, y, health):
-        super().__init__()
-        self.image = pygame.Surface([10 * health, 10]).convert()
-        self.image.fill((0, 0, 250))
-
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
+    def collision(self, ball):
+        if ball.og == 0:
+            if self.rect.x > ball.rect.x + ball.width or self.rect.x + self.width < ball.rect.x:
+                return False
+            if self.rect.y > ball.rect.y + ball.height or self.rect.y + self.height < ball.rect.y:
+                return False
+            return True
+        return False
 
 class MagicBall(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, speed, origin):
         super().__init__()
-        self.image = pygame.transform.flip(magicBallImg, True, False)
+        self.speed = speed
+        self.image = 0
+        if self.speed > 0:
+            self.image = pygame.transform.flip(magicBallImg, True, False)
+        else:
+            self.image = magicBallImg
 
         self.rect = self.image.get_rect()
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
         self.rect.x = x
         self.rect.y = y
+        self.og = origin #1 means from monster, 0 means from player
+    def update(self):
+        self.rect.x += self.speed * (1/TICK_TIME)
 
 class Platform(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -72,14 +89,27 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
         self.dx = 0
         self.dy = 0
+        self.direction = 1 #1 is right, -1 is left
+        self.health = 5
 
     def update(self):
         self.rect.x += self.dx * (1/TICK_TIME)
         self.rect.y += self.dy * (1/TICK_TIME)
 
-        print(f'{self.dx}, {self.dy}')
+
+        #print(f'{self.dx}, {self.dy}')
+    def collision(self, ball):
+        if ball.og == 1:
+            if self.rect.x > ball.rect.x + ball.width or self.rect.x + self.width < ball.rect.x:
+                return False
+            if self.rect.y > ball.rect.y + ball.height or self.rect.y + self.height < ball.rect.y:
+                return False
+            return True
+        return False
 
 pygame.init()
 
@@ -89,23 +119,23 @@ pygame.display.set_caption("MOCO Hackathon 2023")
 player = Player(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
 spritesList = pygame.sprite.Group()
 spritesList.add(player)
-
-
+bulletsList = []
+monstersList = []
 for i in range(5):
     xpos = random.randint(0, 1000)
     ypos = random.randint(0, 500)
     m = Monster(xpos, ypos)
-    mh = MonsterHealth(xpos, ypos - 10, m.health)
-    p = Platform(xpos-100, ypos+30)
-    spritesList.add(m, p, mh)
+    p = Platform(xpos-100 + random.randint(10, 30), ypos+30)
+    spritesList.add(m, p)
+    monstersList.append(m)
 
-spritesList.add(MagicBall(100, 100))
 
 clock = pygame.time.Clock()
 
 play = True
 
 while play:
+    screen.fill((0, 0, 0))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             play = False
@@ -125,13 +155,41 @@ while play:
 
         if keys[pygame.K_LEFT]:
             player.dx = -100
+            player.direction = -1
         elif keys[pygame.K_RIGHT]:
             player.dx = 100
+            player.direction = 1
         else:
             player.dx = 0
-
-    pygame.draw.rect(screen, (0, 0, 0), pygame.rect.Rect((player.rect.x, player.rect.y, 50, 50)))
+        if keys[pygame.K_SPACE]:
+            b1 = MagicBall(player.rect.x, player.rect.y, 500 * player.direction, 0)
+            bulletsList.append(b1)
+            spritesList.add(b1)
+    
+    #pygame.draw.rect(screen, (0, 0, 0), pygame.rect.Rect((player.rect.x, player.rect.y, 50, 50)))
     player.update()
+    for bullet in bulletsList:
+        flag = False
+        # for i in range(len(monstersList)):
+        #     mons = monstersList[i]
+        #     if mons.collision(bullet):
+        #         mons.kill()
+        #         monstersList.pop(i)
+        for mons in monstersList:
+            if mons.collision(bullet):
+                
+                flag = True
+                mons.kill()
+                bullet.kill()
+                mons.rect.y = -10000
+                #monstersList.remove(mons)
+                #bulletsList.remove(bullet)
+            
+        print(bullet.rect.x)
+        if not flag:
+            bullet.update()
+        else:
+            bulletsList.remove(bullet)
     #screen.blit(monsterImg, (200, 200))
     spritesList.draw(screen)
 
