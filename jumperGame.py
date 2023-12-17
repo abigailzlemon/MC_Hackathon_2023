@@ -42,19 +42,24 @@ playerImg = pygame.transform.scale(playerImg, SCALE_IMAGE_CHIHIRO)
 magicBallPath = os.path.join(basePath, "magicBall.png")
 magicBallImg = pygame.image.load(magicBallPath)
 magicBallImg = pygame.transform.scale(magicBallImg, SCALE_IMAGE_BALL)
-redBallPath = os.path.join(basePath, "blueBoltPNG.png")
-redBallImg = pygame.image.load(redBallPath)
-redBallImg = pygame.transform.scale(redBallImg, SCALE_IMAGE_BALL)
+# redBallPath = os.path.join(basePath, "blueBoltPNG.png")
+# redBallImg = pygame.image.load(redBallPath)
+# redBallImg = pygame.transform.scale(redBallImg, SCALE_IMAGE_BALL)
 bgPath = os.path.join(basePath,"bg.png")
 bg = pygame.image.load(bgPath)
 sootPath = os.path.join(basePath, "soot.png")
 sootImg = pygame.image.load(sootPath)
 sootImg = pygame.transform.scale(sootImg, SCALE_IMAGE_CHIHIRO)
-goblinPath = os.path.join(basePath, "goblin.png")
-goblinImg = pygame.image.load(goblinPath)
-goblinImg = pygame.transform.scale(goblinImg, SCALE_IMAGE_CHIHIRO)
+cloud1Path = os.path.join(basePath, "cloud1.png")
+cloud1Img = pygame.image.load(cloud1Path)
+cloud1Img = pygame.transform.scale(cloud1Img, SCALE_IMAGE_PLATFORM)
+cloud2Path = os.path.join(basePath, "cloud2.png")
+cloud2Img = pygame.image.load(cloud2Path)
+cloud2Img = pygame.transform.scale(cloud2Img, SCALE_IMAGE_PLATFORM)
 
 monsterImgs = ["witchleft.png", "soot.png", "goblin.png"]
+cloudImgs = ["cloud1.png", "cloud2.png"]
+
 
 
 class Monster(pygame.sprite.Sprite):
@@ -92,6 +97,9 @@ class MagicBall(pygame.sprite.Sprite):
         self.speed = speed
         self.image = 0
         self.og = origin #1 means from monster, 0 means from player
+        blueBoltImg = pygame.image.load(os.path.join(basePath, "blueBoltPNG.png"))
+        blueBoltImg = pygame.transform.scale(blueBoltImg, SCALE_IMAGE_CHIHIRO)
+
         if self.og == 0:
             if self.speed > 0:
                 self.image = pygame.transform.flip(magicBallImg, True, False)
@@ -99,15 +107,15 @@ class MagicBall(pygame.sprite.Sprite):
                 self.image = magicBallImg
         else:
             if self.speed > 0:
-                self.image = pygame.transform.flip(redBallImg, True, False)
+                self.image = pygame.transform.flip(blueBoltImg, True, False)
             else:
-                self.image = redBallImg
+                self.image = blueBoltImg
         self.speed = speed
         
-        if self.speed > 0:
-            self.image = pygame.transform.flip(magicBallImg, True, False)
-        else:
-            self.image = magicBallImg
+        # if self.speed > 0:
+        #     self.image = pygame.transform.flip(magicBallImg, True, False)
+        # else:
+        #     self.image = magicBallImg 
 
         self.rect = self.image.get_rect()
         self.width = self.image.get_width()
@@ -121,9 +129,9 @@ class MagicBall(pygame.sprite.Sprite):
         self.rect.x += self.speed * (1/TICK_TIME)
 
 class Platform(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, imgPath):
         super().__init__()
-        self.image = platformImg
+        self.image = pygame.transform.scale(pygame.image.load(imgPath), SCALE_IMAGE_PLATFORM)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -191,11 +199,11 @@ for i in range(5):
     xpos = random.randint(100*i, 1000)
     ypos = random.randint(50*i, 500)
     m = Monster(xpos, ypos, random.randint(70, 150), os.path.join(basePath, random.choice(monsterImgs)))
-    p = Platform(xpos-100 + random.randint(10, 30), ypos+30)
+    p = Platform(xpos-100 + random.randint(10, 30), ypos+30, os.path.join(basePath, random.choice(cloudImgs)))
     spritesList.add(m, p)
     monstersList.append(m)
 
-    p = Platform(xpos-100 + random.randint(10, 30), ypos+30)
+    p = Platform(xpos-100 + random.randint(10, 30), ypos+30, os.path.join(basePath, random.choice(cloudImgs)))
     spritesList.add(m, p)
     monstersList.append(m)
 
