@@ -86,6 +86,8 @@ while play:
 
         if keys[pygame.K_UP]:
             player.dy = -100
+        elif keys[pygame.K_DOWN]:
+            player.dy = 100
         else:
             player.dy = 0
 
